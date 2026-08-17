@@ -338,7 +338,7 @@ static inline void context_clean_registers(Context *ctx, int live)
 static inline term *context_stack_base(const Context *ctx)
 {
     // Find which fragment the stack belongs to.
-    if (ctx->e >= ctx->heap.heap_start && ctx->e <= ctx->heap.heap_end) {
+    if (ctx->e >= memory_heap_start(&ctx->heap) && ctx->e <= ctx->heap.heap_end) {
         return ctx->heap.heap_end;
     }
     HeapFragment *fragment = ctx->heap.root->next;
@@ -376,7 +376,7 @@ static inline size_t context_stack_size(const Context *ctx)
 static inline size_t context_avail_free_memory(const Context *ctx)
 {
     // Check if stack is on current fragment
-    if (ctx->e <= ctx->heap.heap_end && ctx->e >= ctx->heap.heap_start) {
+    if (ctx->e <= ctx->heap.heap_end && ctx->e >= memory_heap_start(&ctx->heap)) {
         return ctx->e - ctx->heap.heap_ptr;
     }
     return ctx->heap.heap_end - ctx->heap.heap_ptr;

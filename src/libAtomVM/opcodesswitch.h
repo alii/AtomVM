@@ -1105,7 +1105,7 @@ static inline ModuleNativeEntryPoint do_return_native(Module *mod, Context *ctx)
         if (maybe_call_native(ctx, module_name, function_name, fun_arity, &return_value)) { \
             PROCESS_MAYBE_TRAP_RETURN_VALUE(return_value);              \
             x_regs[0] = return_value;                                   \
-            if (ctx->heap.root->next) {                                 \
+            if (memory_heap_fragments_need_gc(&ctx->heap)) {                                 \
                 if (UNLIKELY(memory_ensure_free_with_roots(ctx, 0, 1, x_regs, MEMORY_FORCE_SHRINK) != MEMORY_GC_OK)) { \
                     RAISE_ERROR(OUT_OF_MEMORY_ATOM);                    \
                 }                                                       \
@@ -1957,7 +1957,7 @@ schedule_in:
                         term return_value = nif->nif_ptr(ctx, arity, x_regs);
                         PROCESS_MAYBE_TRAP_RETURN_VALUE_RESTORE_PC_INDEX_ARITY(return_value, orig_pc, mod, index, arity);
                         x_regs[0] = return_value;
-                        if (ctx->heap.root->next) {
+                        if (memory_heap_fragments_need_gc(&ctx->heap)) {
                             if (UNLIKELY(memory_ensure_free_with_roots(ctx, 0, 1, x_regs, MEMORY_FORCE_SHRINK) != MEMORY_GC_OK)) {
                                 RAISE_ERROR(OUT_OF_MEMORY_ATOM);
                             }
@@ -2082,7 +2082,7 @@ schedule_in:
                         ctx->cp = ctx->e[n_words];
                         ctx->e += (n_words + 1);
 
-                        if (ctx->heap.root->next) {
+                        if (memory_heap_fragments_need_gc(&ctx->heap)) {
                             if (UNLIKELY(memory_ensure_free_with_roots(ctx, 0, 1, x_regs, MEMORY_FORCE_SHRINK) != MEMORY_GC_OK)) {
                                 RAISE_ERROR(OUT_OF_MEMORY_ATOM);
                             }
@@ -2371,7 +2371,7 @@ schedule_in:
                 ctx->e += n_words + 1;
                 DEBUG_DUMP_STACK(ctx);
                 // Hopefully, we only need x[0]
-                if (ctx->heap.root->next) {
+                if (memory_heap_fragments_need_gc(&ctx->heap)) {
                     if (UNLIKELY(memory_ensure_free_with_roots(ctx, 0, 1, x_regs, MEMORY_FORCE_SHRINK) != MEMORY_GC_OK)) {
                         RAISE_ERROR(OUT_OF_MEMORY_ATOM);
                     }
@@ -3180,7 +3180,7 @@ schedule_in:
                         PROCESS_MAYBE_TRAP_RETURN_VALUE_LAST(return_value);
                         x_regs[0] = return_value;
 
-                        if (ctx->heap.root->next) {
+                        if (memory_heap_fragments_need_gc(&ctx->heap)) {
                             if (UNLIKELY(memory_ensure_free_with_roots(ctx, 0, 1, x_regs, MEMORY_FORCE_SHRINK) != MEMORY_GC_OK)) {
                                 RAISE_ERROR(OUT_OF_MEMORY_ATOM);
                             }
